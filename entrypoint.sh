@@ -31,16 +31,15 @@ ModsLowercase () {
 
 # Define check mods for updates function
 ModsOutdated () {
-	if [ -d "$1" ]; then
-		echo -e "\n${GREEN}STARTUP:${NC} Checking mod ${CYAN}$1${NC} for update..."
+	if [ -d "@$1" ]; then
+		echo -e "\n${GREEN}STARTUP:${NC} Checking mod ${CYAN}@$1${NC} for update..."
 
-		LOCAL_CHANGE=`stat -c %Y "$1"`
-		REMOTEMOD=`curl -s --data "itemcount=1&publishedfileids[0]=${1//@}" https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/`
+		LOCAL_CHANGE=`stat -c %Y "@$1"`
+		REMOTEMOD=`curl -s --data "itemcount=1&publishedfileids[0]=$1" https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/`
 		REMOTE_CHANGE=`grep -oP '"time_updated":\K[0-9]{5,32}' <<< "$REMOTEMOD"`
 		NAME=`grep -oP '"title":"\K[a-z0-9A-Z_\-@]{1,128}' <<< "$REMOTEMOD"`
 
-		if [ "$REMOTE_CHANGE" -gt "$LOCAL_CHANGE" ]
-		then
+		if [ "$REMOTE_CHANGE" -gt "$LOCAL_CHANGE" ]; then
 			echo -e "\n${GREEN}STARTUP:${NC} Mod ${RED}$NAME outdated${NC}"
 			UpdateMod $1
 		else
@@ -99,7 +98,7 @@ if [[ -n ${UPDATE_WORKSHOP} ]];
 then
 	for i in $(echo -e ${UPDATE_WORKSHOP} | sed "s/,/ /g")
 	do
-		ModsOutdated @$i
+		ModsOutdated $i
 	done
 	echo -e "\n${GREEN}STARTUP: Download/Update Steam Workshop mods complete!${NC}\n"
 fi
