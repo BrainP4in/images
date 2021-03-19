@@ -43,13 +43,13 @@ ModsOutdated () {
 		echo -e "\n${GREEN}STARTUP:${NC} Checking mod ${CYAN}@$1${NC} for update..."
 
 		if [ "$REMOTE_CHANGE" -gt "$LOCAL_CHANGE" ]; then
-			echo -e "\n${GREEN}STARTUP:${NC} Mod ${RED}$NAME outdated${NC}"
+			echo -e "${NC}   ${RED}$NAME outdated${NC}"
 			UpdateMod $1 $NAME
 		else
-			echo -e "\n${GREEN}STARTUP:${NC} Mod ${GREEN}$NAME latest version${NC}"
+			echo -e "${NC}   ${GREEN}$NAME latest version${NC}"
 		fi
 	else
-		echo -e "\n${GREEN}STARTUP:${NC} Installing mod ${CYAN}$1${NC}..."
+		echo -e "${NC}   Installing ${CYAN}$NAME${NC}..."
 		UpdateMod $1 $NAME
 	fi
 
