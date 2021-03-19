@@ -32,12 +32,13 @@ ModsLowercase () {
 # Define check mods for updates function
 ModsOutdated () {
 
-	LOCAL_CHANGE=`stat -c %Y "shared/@$1"`
 	REMOTEMOD=`curl -s --data "itemcount=1&publishedfileids[0]=$1" https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/`
 	REMOTE_CHANGE=`grep -oP '"time_updated":\K[0-9]{5,32}' <<< "$REMOTEMOD"`
 	NAME=`grep -oP '"title":"\K[a-z0-9A-Z_\-@]{1,128}' <<< "$REMOTEMOD"`
 
-	if [ -d "@$1" ]; then
+	if [ -d "shared/@$1" ]; then
+		LOCAL_CHANGE=`stat -c %Y "shared/@$1"`
+
 		echo -e "\n${GREEN}STARTUP:${NC} Checking mod ${CYAN}@$1${NC} for update..."
 
 		if [ "$REMOTE_CHANGE" -gt "$LOCAL_CHANGE" ]; then
