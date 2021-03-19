@@ -19,7 +19,7 @@ sleep 1
 # Define make mods lowercase function
 ModsLowercase () {
 	echo -e "\n${GREEN}STARTUP:${NC} Making mod ${CYAN}$1${NC} files/folders lowercase..."
-	for SRC in `find ./$1 -depth`
+	for SRC in `find ./shared/$1 -depth`
 	do
 		DST=`dirname "${SRC}"`/`basename "${SRC}" | tr '[A-Z]' '[a-z]'`
 		if [ "${SRC}" != "${DST}" ]
@@ -31,23 +31,24 @@ ModsLowercase () {
 
 # Define check mods for updates function
 ModsOutdated () {
+
+	LOCAL_CHANGE=`stat -c %Y "shared/@$1"`
+	REMOTEMOD=`curl -s --data "itemcount=1&publishedfileids[0]=$1" https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/`
+	REMOTE_CHANGE=`grep -oP '"time_updated":\K[0-9]{5,32}' <<< "$REMOTEMOD"`
+	NAME=`grep -oP '"title":"\K[a-z0-9A-Z_\-@]{1,128}' <<< "$REMOTEMOD"`
+
 	if [ -d "@$1" ]; then
 		echo -e "\n${GREEN}STARTUP:${NC} Checking mod ${CYAN}@$1${NC} for update..."
 
-		LOCAL_CHANGE=`stat -c %Y "@$1"`
-		REMOTEMOD=`curl -s --data "itemcount=1&publishedfileids[0]=$1" https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/`
-		REMOTE_CHANGE=`grep -oP '"time_updated":\K[0-9]{5,32}' <<< "$REMOTEMOD"`
-		NAME=`grep -oP '"title":"\K[a-z0-9A-Z_\-@]{1,128}' <<< "$REMOTEMOD"`
-
 		if [ "$REMOTE_CHANGE" -gt "$LOCAL_CHANGE" ]; then
 			echo -e "\n${GREEN}STARTUP:${NC} Mod ${RED}$NAME outdated${NC}"
-			UpdateMod $1
+			UpdateMod $1 $NAME
 		else
 			echo -e "\n${GREEN}STARTUP:${NC} Mod ${GREEN}$NAME latest version${NC}"
 		fi
 	else
 		echo -e "\n${GREEN}STARTUP:${NC} Installing mod ${CYAN}$1${NC}..."
-		UpdateMod $1
+		UpdateMod $1 $NAME
 	fi
 
 }
@@ -56,15 +57,15 @@ UpdateMod () {
 	echo -e "\n${GREEN}STARTUP:${NC} Downloading/Updating Steam Workshop mod ID: ${CYAN}$1${NC}...\n"
 	./steamcmd/steamcmd.sh +login ${STEAM_USER} ${STEAM_PASS} +workshop_download_item $armaGameID $1 validate +quit
 	# Move the downloaded mod to the root directory, and replace existing mod if needed
-	mkdir -p ./@$1
-	rm -rf ./@$1/*
-	mv -f ./Steam/steamapps/workshop/content/$armaGameID/$1/* ./@$1
+	mkdir -p ./shared/@$2
+	rm -rf ./shared/@$2/*
+	mv -f ./Steam/steamapps/workshop/content/$armaGameID/$1/* ./shared/@$2
 	rm -d ./Steam/steamapps/workshop/content/$armaGameID/$1
 	# Make the mods contents all lowercase
-	ModsLowercase @$1
+	ModsLowercase @$2
 	# Move any .bikey's to the keys directory
 	echo -e "\n${GREEN}STARTUP:${NC} Moving any mod .bikey files to the ~/keys/ folder...\n"
-	find ./@$1 -name "*.bikey" -type f -exec cp {} ./keys \;
+	find ./shared/@$2 -name "*.bikey" -type f -exec cp {} ./keys \;
 
 }
 
