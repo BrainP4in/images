@@ -62,12 +62,13 @@ UpdateMod () {
 	rm -rf ./shared/@$2/*
 	mv -f ./Steam/steamapps/workshop/content/$armaGameID/$1/* ./shared/@$2
 	rm -d ./Steam/steamapps/workshop/content/$armaGameID/$1
-	# Make the mods contents all lowercase
-	ModsLowercase @$2
+
 	# Move any .bikey's to the keys directory
 	echo -e "\n${GREEN}STARTUP:${NC} Moving any mod .bikey files to the ~/keys/ folder...\n"
 	find ./shared/@$2 -name "*.bikey" -type f -exec cp {} ./keys \;
 
+	# Make the mods contents all lowercase
+	ModsLowercase @$2
 }
 
 
