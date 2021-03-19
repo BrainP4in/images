@@ -35,7 +35,7 @@ ModsOutdated () {
 	REMOTEMOD=`curl -s --data "itemcount=1&publishedfileids[0]=$1" https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/`
 	REMOTE_CHANGE=`grep -oP '"time_updated":\K[0-9]{5,32}' <<< "$REMOTEMOD"`
 	NAME=`grep -oP '"title":"\K[a-z0-9A-Z_\-@]{1,128}' <<< "$REMOTEMOD"`
-	NAME_LOWER =`echo "$NAME" | sed -e 's/\(.*\)/\L\1/'`
+	NAME_LOWER=`echo "$NAME" | sed -e 's/\(.*\)/\L\1/'`
 
 	if [ -d "shared/@$NAME_LOWER" ]; then
 		LOCAL_CHANGE=`stat -c %Y "shared/@$1"`
