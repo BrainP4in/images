@@ -56,20 +56,22 @@ ModsOutdated () {
 }
 
 UpdateMod () {
+	NAME_LOWER=`echo "$2" | sed -e 's/\(.*\)/\L\1/'`
+
 	echo -e "\n${GREEN}STARTUP:${NC} Downloading/Updating Steam Workshop mod ID: ${CYAN}$1${NC}...\n"
 	./steamcmd/steamcmd.sh +login ${STEAM_USER} ${STEAM_PASS} +workshop_download_item $armaGameID $1 validate +quit
 	# Move the downloaded mod to the root directory, and replace existing mod if needed
-	mkdir -p ./shared/@$2
-	rm -rf ./shared/@$2/*
-	mv -f ./Steam/steamapps/workshop/content/$armaGameID/$1/* ./shared/@$2
+	mkdir -p ./shared/@$NAME_LOWER
+	rm -rf ./shared/@$NAME_LOWER/*
+	mv -f ./Steam/steamapps/workshop/content/$armaGameID/$1/* ./shared/@$NAME_LOWER
 	rm -d ./Steam/steamapps/workshop/content/$armaGameID/$1
 
 	# Move any .bikey's to the keys directory
 	echo -e "\n${GREEN}STARTUP:${NC} Moving any mod .bikey files to the ~/keys/ folder...\n"
-	find ./shared/@$2 -name "*.bikey" -type f -exec cp {} ./keys \;
+	find ./shared/@$NAME_LOWER -name "*.bikey" -type f -exec cp {} ./keys \;
 
 	# Make the mods contents all lowercase
-	ModsLowercase @$2
+	ModsLowercase @$NAME_LOWER
 }
 
 
