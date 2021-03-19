@@ -38,7 +38,7 @@ ModsOutdated () {
 	NAME_LOWER=`echo "$NAME" | sed -e 's/\(.*\)/\L\1/'`
 
 	if [ -d "shared/@$NAME_LOWER" ]; then
-		LOCAL_CHANGE=`stat -c %Y "shared/@$1"`
+		LOCAL_CHANGE=`stat -c %Y "shared/@$NAME_LOWER"`
 
 		echo -e "\n${GREEN}STARTUP:${NC} Checking mod ${CYAN}@$1${NC} for update..."
 
